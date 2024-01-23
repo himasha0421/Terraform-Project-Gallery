@@ -40,7 +40,7 @@ folder structure
 
 details about aws modules used :
 
-1. VPC 
+### 1. VPC 
 
 ```yaml
 module "vpc" {
@@ -80,3 +80,50 @@ important :
 3. To ensure the security of the application server, implement a strategy to mask the server's IP when communicating with the external world. Attach a NAT gateway to each Availability Zone (AZ) to facilitate secure communication.
 
 4. Create VPC flow logs to monitor and analyze the traffic flow within the VPC.
+
+
+### 2. Security Group
+
+```yaml
+
+module "security_group" {
+
+  source      = "terraform-aws-modules/security-group/aws"
+  name        = <SG Name>
+  description = "security group with defined rules"
+
+  # attach the above created vpc into SG
+  vpc_id = module.vpc.vpc_id
+
+  # ingress rules for cidr blocks (allow only port 8000,80 port traffic)
+  ingress_with_cidr_blocks = [
+    {
+      cidr_blocks = "0.0.0.0/0"
+      from_port   = 8000
+      to_port     = 8000
+      protocol    = "tcp"
+      description = "custom python server firewall rule"
+    },
+
+    {
+      cidr_blocks = "0.0.0.0/0"
+      rule        = "http-80-tcp"
+      description = "http request firewall rule"
+    }
+
+  ]
+
+  # define egress rules (allow all the traffic)
+  egress_rules = ["all-all"]
+
+  tags = local.tags
+}
+```
+
+important:
+
+1. Associate the VPC with a security group and enforce security rules specifically for traffic within the VPC.
+
+2. Establish inbound and outbound security rules, enabling the restriction of IP ranges and ports. Permit incoming traffic on port 8000 from the internet and allow port 80 for HTTP web traffic (```for the Application Load Balancer```). The default AWS configuration permits all outbound traffic, and it is acceptable to maintain this setting, given the configuration of NAT gateways within the public subnets.
+
+
