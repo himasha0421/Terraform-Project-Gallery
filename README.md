@@ -4,7 +4,7 @@
 
 ### Project 1: AWS Private/Public Subnet Application Deployment
 
-![](./VPC-concepts/aws-private-subnet-vm.png)
+![](./aws-vpc/aws-private-subnet-vm.png)
 
 * concept: 
 
